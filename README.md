@@ -1,15 +1,11 @@
-# devops_netology
+**/.terraform/*		игнорируем все файлы, которые находятся в поддиректории .terraform
+.tfstate		игнорируем файлы c расширением .tfstate
+crash.log		игнорируем лог-файл crash.log
+.tfvars			игнорируем файлы c расширением .tfvars
+override.tf		игнорируем файл override.tf
+override.tf.json	игнорируем файл override.tf.json
+*_override.tf		игнорируем файл, который заканчивается на _override.tf
+*_override.tf.json	игнорируем файл, который заканчивается на _override.tf.json
+.terraformrc		игнорируем скрытый файл .terraformrc
+terraform.rc		игнорируем файл terraform.rc
 
-interface GigabitEthernet1/0/1
- switchport mode access
- switch port access vlan 1000
- switchport voice vlan 1001
- spanning-tree portfast
- spanning-tree bpduguard enable
- switchport port-security
- switchport port-security maximum 2
- switchport port-security mac-address sticky
- switchport port-security violation restrict
-!
-
-copy run sta
