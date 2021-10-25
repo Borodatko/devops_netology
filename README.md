@@ -7,4 +7,4 @@ override.tf.json	игнорируем файл override.tf.json\
 *_override.tf		игнорируем файл, который заканчивается на _override.tf\
 *_override.tf.json	игнорируем файл, который заканчивается на _override.tf.json\
 .terraformrc		игнорируем скрытый файл .terraformrc\
-terraform.rc		игнорируем файл terraform.rc\
+terraform.rc		игнорируем файл terraform.rc
