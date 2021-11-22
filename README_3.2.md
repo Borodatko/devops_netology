@@ -24,8 +24,8 @@ root           1  0.4  1.1 101692 11268 ?        Ss   14:05   0:01 /sbin/init_
 
 **7.**
 
-_root@docker:~# bash 5>&1\
-root@docker:~#_
+_root@docker:~\# bash 5>&1\
+root@docker:~\#_
 
 _root@docker:~# echo netology > /proc/$$/fd/5\
 netology_
