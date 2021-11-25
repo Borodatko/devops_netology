@@ -13,7 +13,7 @@ USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\
 root           1  0.4  1.1 101692 11268 ?        Ss   14:05   0:01 /sbin/init_
 
 
-**4.** ***ls > /dev/pts/1***
+**4.** ***ls 2> /dev/pts/1***
 
 
 **5.** ***df -h | tee disk_usage.txt***
@@ -33,10 +33,11 @@ netology_
 ***Команда аналогична >&1***
 
 
-**8.** ***command 2>&1 >/dev/null | grep 'something'***
+**8.** ***command 2>&1 > file | grep 'something'***
 
 
 **9.** ***Выведет переменные окружения***
+***env; printenv; set; если просто PATH, то echo $PATH***
 
 
 **10.** 
@@ -58,5 +59,10 @@ _vagrant@localhost's password:\
 /dev/pts/2\
 Connection to localhost closed._
 
+**13.**
+***htop\
+ctrl+z\
+screen\
+reptyr $(pgrep htop)***
 
 **14.** ***Tee берет со стандартного ввод и пишет в стандартный вывод и файл.***
