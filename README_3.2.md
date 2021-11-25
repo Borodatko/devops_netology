@@ -36,7 +36,7 @@ netology_
 **8.** ***command 2>&1 > file | grep 'something'***
 
 
-**9.** ***Выведет переменные окружения***
+**9.** ***Выведет переменные окружения***\
 ***env; printenv; set; если просто PATH, то echo $PATH***
 
 
@@ -59,7 +59,7 @@ _vagrant@localhost's password:\
 /dev/pts/2\
 Connection to localhost closed._
 
-**13.**
+**13.**\
 ***htop\
 ctrl+z\
 screen\
