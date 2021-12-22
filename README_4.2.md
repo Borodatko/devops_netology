@@ -20,8 +20,8 @@ c = a + b
 | Вопрос  | Ответ |
 | ------------- | ------------- |
 | Какое значение будет присвоено переменной `c`?  | Будет ошибка: TypeError: unsupported operand type(s) for +: 'int' and 'str'. Происходит сложение целочисленной переменной и строковой. |
-| Как получить для переменной `c` значение 12?  | a = '1' |
-| Как получить для переменной `c` значение 3?  | b = 2 |
+| Как получить для переменной `c` значение 12?  | c = str(a) + b |
+| Как получить для переменной `c` значение 3?  | c = a + int(b) |
 
 ## Обязательная задача 2
 Мы устроились на работу в компанию, где раньше уже был DevOps Engineer. Он написал скрипт, позволяющий узнать, какие файлы модифицированы в репозитории, относительно локальных изменений. Этим скриптом недовольно начальство, потому что в его выводе есть не все изменённые файлы, а также непонятен полный путь к директории, где они находятся. Как можно доработать скрипт ниже, чтобы он исполнял требования вашего руководителя?
@@ -112,30 +112,32 @@ Enter path:
 import socket
 import time
 
-services = ["drive.google.com", "mail.google.com", "google.com"]
+services = {"drive.google.com": "0.0.0.0", "mail.google.com": "0.0.0.0", "google.com": "0.0.0.0"}
 
-
-while ( 1 == 1 ):
+while 1 == 1:
     for host in services:
         ip = socket.gethostbyname(host)
-        time.sleep(1)
-        ip_new = socket.gethostbyname(host)
-        if ip == ip_new:
-            print(host, "-", ip)
+        if ip != services[host]:
+            print("[ERROR]", host, "IP mismatch:", services[host], ip)
         else:
-            print("[ERROR]", host, "IP mismatch:", ip, ip_new)
+            print(host, "-", ip)
+        services[host] = ip
+    time.sleep(1)
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
 root@docker:/home/netology# ./check_service.py
+[ERROR] drive.google.com IP mismatch: 0.0.0.0 173.194.222.194
+[ERROR] mail.google.com IP mismatch: 0.0.0.0 64.233.162.19
+[ERROR] google.com IP mismatch: 0.0.0.0 64.233.164.101
 drive.google.com - 173.194.222.194
-[ERROR] mail.google.com IP mismatch: 64.233.162.17 64.233.162.83
-[ERROR] google.com IP mismatch: 64.233.164.138 64.233.164.100
+[ERROR] mail.google.com IP mismatch: 64.233.162.19 64.233.162.83
+[ERROR] google.com IP mismatch: 64.233.164.101 64.233.164.139
 drive.google.com - 173.194.222.194
-[ERROR] mail.google.com IP mismatch: 64.233.162.19 64.233.162.18
-[ERROR] google.com IP mismatch: 64.233.164.101 64.233.164.102
-drive.google.com - 173.194.222.194
-[ERROR] mail.google.com IP mismatch: 64.233.162.17 64.233.162.83
+[ERROR] mail.google.com IP mismatch: 64.233.162.83 64.233.162.18
 [ERROR] google.com IP mismatch: 64.233.164.139 64.233.164.113
+drive.google.com - 173.194.222.194
+[ERROR] mail.google.com IP mismatch: 64.233.162.18 64.233.162.17
+[ERROR] google.com IP mismatch: 64.233.164.113 64.233.164.138
 ```
