@@ -1,4 +1,5 @@
 **Установите ufw и разрешите к этой машине сессии на порты 22 и 443, при этом трафик на интерфейсе localhost (lo) должен ходить свободно на все порты.**
+
 ```
 #### UFW INSTALL
 root@debian:~# apt install ufw
@@ -60,7 +61,8 @@ Anywhere                   ALLOW       127.0.0.1
 
 
 
-**Установите hashicorp vault**
+**Установите hashicorp vault.**
+
 ```
 #### INSTALL VAULT
 root@debian:~# curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
@@ -147,6 +149,7 @@ Success! Uploaded policy: admin
 
 
 **Cоздайте центр сертификации и выпустите сертификат для использования его в настройке веб-сервера nginx (срок жизни сертификата - месяц).**
+
 ```
 #### GENERATE CA
 netology@debian:~$ vault secrets enable pki
@@ -179,6 +182,7 @@ netology@debian:~$ cat web.example.com.crt | jq -r .data.private_key > web.examp
 
 
 **Установите nginx.**
+
 ```#### INSTALL NGINX
 root@debian:~# apt install nginx
 Reading package lists... Done
@@ -325,12 +329,14 @@ Processing triggers for libc-bin (2.28-10) ...
 
 
 
-**Настройте nginx на https, используя ранее подготовленный сертификат**
+**Настройте nginx на https, используя ранее подготовленный сертификат.**
+
 Закомментировать в /etc/nginx/sites-available/default строки:
 ```
 #       listen 80 default_server;
 #       listen [::]:80 default_server;
 ```
+
 И добавить:
 ```
 listen              443 ssl;
@@ -340,6 +346,7 @@ ssl_certificate_key /home/netology/web.example.com.crt.key;
 ssl_protocols       TLSv1.2 TLSv1.3;
 ssl_ciphers         HIGH:!aNULL:!MD5;
 ```
+
 ```
 root@debian:/home/netology# nginx -t
 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
@@ -364,12 +371,14 @@ root@debian:/home/netology# systemctl status nginx
 
 
 
-**Откройте в браузере на хосте https адрес страницы, которую обслуживает сервер nginx.**\
-[Screen_1](https://github.com/Borodatko/devops_netology/blob/efdfdbc6b3fb985860d224a7148467883388219d/web.jpg)
+**Откройте в браузере на хосте https адрес страницы, которую обслуживает сервер nginx.**
+
+***[Screen_1](https://github.com/Borodatko/devops_netology/blob/efdfdbc6b3fb985860d224a7148467883388219d/web.jpg)***
 
 
 
-**Создайте скрипт, который будет генерировать новый сертификат в vault**
+**Создайте скрипт, который будет генерировать новый сертификат в vault.**
+
 ```
 netology@debian:~$ cat /home/netology/cert.sh
 #!/usr/bin/env bash
@@ -405,6 +414,7 @@ netology        ALL = NOPASSWD: /etc/init.d/nginx
 
 
 **Поместите скрипт в crontab, чтобы сертификат обновлялся какого-то числа каждого месяца в удобное для вас время.**
+
 ```
 netology@debian:~$ crontab -l
 # m h  dom mon dow   command
@@ -412,7 +422,8 @@ netology@debian:~$ crontab -l
 ```
 
 
-**Crontab работает (выберите число и время так, чтобы показать что crontab запускается и делает что надо)**
+**Crontab работает (выберите число и время так, чтобы показать что crontab запускается и делает что надо).**
+
 ```
 netology@debian:~$ date
 Mon Jan  3 16:25:50 MSK 2022
@@ -422,4 +433,5 @@ netology@debian:~$ crontab -l
 netology@debian:~$ date
 Mon Jan  3 16:27:05 MSK 2022
 ```
-[Screen_2](https://github.com/Borodatko/devops_netology/blob/efdfdbc6b3fb985860d224a7148467883388219d/web_update_cert.jpg)
+Скриншот в указанием срока действия сертификата:\
+***[Screen_2](https://github.com/Borodatko/devops_netology/blob/efdfdbc6b3fb985860d224a7148467883388219d/web_update_cert.jpg)***
