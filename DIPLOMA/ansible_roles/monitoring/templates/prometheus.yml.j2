@@ -1,0 +1,53 @@
+global:
+  scrape_interval: 10s
+
+rule_files:
+  - rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        # Alertmanager's default port is 9093
+        - localhost:9093
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'monitoring'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9100']
+
+  - job_name: 'nginx'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.150:9100']
+
+  - job_name: 'db1'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.151:9100']
+
+  - job_name: 'db2'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.152:9100']
+
+  - job_name: 'app'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.153:9100']
+
+  - job_name: 'gitlab'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.154:9101']
+
+  - job_name: 'runner'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.155:9101']

@@ -1,0 +1,23 @@
+---
+- name: GitLab Runner - Install python-gitlab module
+  become: true
+  ansible.builtin.pip:
+    name:
+      - python-gitlab
+      - gitlab
+    executable: pip3  
+
+- name: GitLab Runner - Register runner
+  become: true
+  command: |
+    gitlab-runner register \
+    --non-interactive \
+    --url "{{ gitlab_ip }}" \
+    --registration-token "{{ gitlab_registration_token }}" \
+    --executor "docker" \
+    --docker-image alpine:latest \
+    --description "docker-runner" \
+    --tag-list "docker" \
+    --run-untagged="false" \
+    --locked="true" \
+    --access-level="ref_protected"

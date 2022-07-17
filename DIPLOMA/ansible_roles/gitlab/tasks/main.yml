@@ -1,0 +1,28 @@
+---
+# tasks file for gitlab
+
+#- include: centos.yml
+#  when: ansible_os_family == "Redhat"
+
+- include_tasks: yum_gitlab.yml
+  when:
+    inventory_hostname == "gitlab-01"
+  tags: [always]
+
+- include_tasks: gitlab.yml
+  when:
+    inventory_hostname == "gitlab-01"
+  tags: [always]
+
+- include_tasks: yum_runner.yml
+  when:
+    inventory_hostname == "runner-01"
+  tags: [always]
+
+- include_tasks: runner.yml
+  when:
+    inventory_hostname == "runner-01"
+  tags: [always]
+
+- include_tasks: exporter.yml
+  tags: [always]

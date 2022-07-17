@@ -1,0 +1,11 @@
+---
+# defaults file for wordpress
+
+repo_path: "/etc/yum.repos.d"
+fpm_path: "/etc/php-fpm.d"
+php_path: "/var/lib/php"
+nginx_path: "/etc/nginx/conf.d"
+www_path: "/var/www/html"
+tmp_path: "/tmp"
+arch: "linux-amd64"
+bin_path: "/usr/local/bin"

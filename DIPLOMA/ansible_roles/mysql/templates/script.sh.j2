@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+pass=`cat /var/log/mysqld.log | grep "A temporary password is generated for" | awk '{print $NF}'`
+echo $pass

@@ -1,0 +1,59 @@
+---
+# handlers file for monitoring
+
+- name: Reload daemon
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Start grafana
+  become: true
+  ansible.builtin.systemd:
+    name: grafana-server
+    state: started
+    enabled: yes
+
+- name: Restart grafana
+  become: true
+  ansible.builtin.systemd:
+    name: grafana-server
+    state: restarted
+
+- name: Start prometheus
+  become: true
+  ansible.builtin.systemd:
+    name: prometheus
+    state: started
+    enabled: yes
+
+- name: Restart prometheus
+  become: true
+  ansible.builtin.systemd:
+    name: prometheus
+    state: restarted
+
+- name: Start alertmanager
+  become: true
+  ansible.builtin.systemd:
+    name: alertmanager
+    state: started
+    enabled: yes
+
+- name: Restart alertmanager
+  become: true
+  ansible.builtin.systemd:
+    name: alertmanager
+    state: restarted
+
+- name: Start node_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: node_exporter
+    state: started
+    enabled: yes
+
+- name: Restart node_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: node_exporter
+    state: restarted

@@ -1,0 +1,110 @@
+---
+- name: Replication - Create mysql directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ log_path }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+# MASTER
+- name: Replication - Copy my.cnf on Master
+  become: true
+  ansible.builtin.template:
+    src: master_my.cnf.j2
+    dest: "{{ cnf_path }}/my.cnf"
+    mode: '644'
+  notify:
+    - Restart MySQL
+  when:
+    inventory_hostname == "db1"
+  tags: mysql
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Replication - Create replica user
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: localhost
+    name: "{{ replica_user }}"
+    password: "{{ replica_pass }}"
+    host: "{{ replica_host }}"
+    priv: '*.*:REPLICATION SLAVE'
+    state: present
+  when:
+    inventory_hostname == "db1"
+  tags: mysql
+
+# SLAVE
+- name: Replication - Copy my.cnf on Slave
+  become: true
+  ansible.builtin.template:
+    src: slave_my.cnf.j2
+    dest: "{{ cnf_path }}/my.cnf"
+    mode: '644'
+  notify:
+    - Restart MySQL
+  when:
+    inventory_hostname == "db2"
+  tags: mysql
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Replication - Get data from master file and position 
+  community.mysql.mysql_replication:
+    login_user: root                       
+    login_password: "{{ root_password }}"
+    login_host: localhost
+    mode: getmaster
+  register: master_data 
+  when:
+    inventory_hostname == "db2"
+  tags: mysql
+
+- block:
+    - name: Replication - Config slave
+      community.mysql.mysql_replication:
+        login_user: root
+        login_password: "{{ root_password }}"
+        login_host: localhost
+        mode: changemaster
+        master_host: "{{ primary_host }}"
+        master_user: "{{ replica_user }}"
+        master_password: "{{ replica_pass }}"
+        master_log_file: "{{ master_data.File }}"
+        master_log_pos: "{{ master_data.Position }}"
+      when:
+        inventory_hostname == "db2"
+      register: result
+      failed_when: result.msg == -1
+#      failed_when: register is defined
+#      changed_when: false
+  rescue:
+    - name: Replication - Config slave
+      community.mysql.mysql_replication:
+        login_user: root
+        login_password: "{{ root_password }}"
+        login_host: localhost
+        mode: changemaster
+        master_host: "{{ primary_host }}"
+        master_user: "{{ replica_user }}"
+        master_password: "{{ replica_pass }}"
+        master_log_file: "{{ master_data.File }}"
+        master_log_pos: "{{ master_data.Position }}"
+      when:
+        inventory_hostname == "db2"
+  tags: mysql
+
+- name: Replication - Start slave
+  community.mysql.mysql_replication:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: localhost
+    mode: startslave
+  when:
+    inventory_hostname == "db2"
+  tags: mysql

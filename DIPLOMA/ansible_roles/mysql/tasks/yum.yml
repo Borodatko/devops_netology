@@ -1,0 +1,36 @@
+---
+
+- name: Yum - Get md5sum
+  ansible.builtin.set_fact:
+    md5_value: "{{ md5 }}"
+
+- name: Yum - Get MySQL release
+  ansible.builtin.get_url:
+    url: "{{ repo_url }}"
+    dest: "{{ rpm_path }}"
+    checksum: "md5: {{ md5_value }}"
+    force: true
+  tags: mysql
+
+- name: Yum - Import gpg-key
+  become: true
+  ansible.builtin.rpm_key:
+    state: present
+    key: "{{ gpg_url }}"
+  tags: mysql
+
+- name: Yum - Install package
+  become: true
+  ansible.builtin.yum:
+    name: "{{ rpm_path }}"
+    state: present
+  tags: mysql
+
+- name: Yum - Install MySQL server
+  become: true
+  ansible.builtin.yum:
+    name:
+      - mysql-server
+      - MySQL-python
+    state: latest
+  tags: mysql

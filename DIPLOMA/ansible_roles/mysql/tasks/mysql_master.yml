@@ -1,0 +1,26 @@
+---
+
+- name: Master - Copy my.cnf on Master
+  become: true
+  ansible.builtin.template:
+    src: master_my.cnf.j2
+    dest: "{{ cnf_path }}/my.cnf"
+    mode: '644'
+  notify:
+    - Restart MySQL
+  tags: mysql
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Master - Create replica user
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: localhost
+    name: "{{ replica_user }}"
+    password: "{{ replica_pass }}"
+    host: "{{ replica_host }}"
+    priv: '*.*:REPLICATION SLAVE'
+    state: present
+  tags: mysql

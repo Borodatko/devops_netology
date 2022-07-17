@@ -1,0 +1,19 @@
+upstream www.upstream {
+        server 10.20.100.153:80;
+}
+
+upstream gitlab.upstream {
+        server 10.20.100.154:80;
+}
+
+upstream prometheus.upstream {
+        server 10.20.100.156:9090;
+}
+
+upstream alertmanager.upstream {
+        server 10.20.100.156:9093;
+}
+
+upstream grafana.upstream {
+        server 10.20.100.156:3000;
+}

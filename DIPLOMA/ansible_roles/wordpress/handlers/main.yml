@@ -1,0 +1,48 @@
+---
+# handlers file for nginx
+- name: Reload daemon
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Start nginx
+  become: true
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Restart nginx
+  become: true
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+    enabled: yes
+
+- name: Start php-fpm
+  become: true
+  ansible.builtin.systemd:
+    name: php-fpm
+    state: started
+    enabled: yes
+
+- name: Restart php-fpm
+  become: true
+  ansible.builtin.systemd:
+    name: php-fpm
+    state: restarted
+    enabled: yes
+
+- name: Start node_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: node_exporter
+    state: started
+    enabled: yes
+
+- name: Restart node_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: node_exporter
+    state: restarted
+

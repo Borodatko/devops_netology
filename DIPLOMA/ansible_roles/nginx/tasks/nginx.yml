@@ -1,0 +1,54 @@
+---
+
+- name: Nginx - Add www config
+  become: true
+  ansible.builtin.template:
+    src: www.conf.j2
+    dest: "{{ conf_path }}/www.conf"
+    mode: '644'
+  tags: nginx
+
+- name: Nginx - Add prometheus config
+  become: true
+  ansible.builtin.template:
+    src: prometheus.conf.j2
+    dest: "{{ conf_path }}/prometheus.conf"
+    mode: '644'
+  tags: nginx
+
+- name: Nginx - Add alertmanager config
+  become: true
+  ansible.builtin.template:
+    src: alertmanager.conf.j2
+    dest: "{{ conf_path }}/alertmanager.conf"
+    mode: '644'
+  tags: nginx
+
+- name: Nginx - Add grafana config
+  become: true
+  ansible.builtin.template:
+    src: grafana.conf.j2
+    dest: "{{ conf_path }}/grafana.conf"
+    mode: '644'
+  tags: nginx
+
+- name: Nginx - Add gitlab config
+  become: true
+  ansible.builtin.template:
+    src: gitlab.conf.j2
+    dest: "{{ conf_path }}/gitlab.conf"
+    mode: '644'
+  tags: nginx
+
+- name: Nginx - Add upstream config
+  become: true
+  ansible.builtin.template:
+    src: upstream.conf.j2
+    dest: "{{ conf_path }}/upstream.conf"
+    mode: '644'
+  notify:
+    - Restart nginx
+  tags: nginx
+
+- name: Flush handlers
+  meta: flush_handlers

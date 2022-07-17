@@ -1,0 +1,16 @@
+---
+# defaults file for mysql
+
+md5: "62f64deae31dcc2399a0ebe05366498f"
+repo_url: "https://dev.mysql.com/get/mysql80-community-release-el7-6.noarch.rpm"
+rpm_path: "/tmp/mysql80-community-release-el7-6.noarch.rpm"
+gpg_url: "https://repo.mysql.com/RPM-GPG-KEY-mysql-2022"
+
+cnf_path: "/etc"
+path: "/tmp"
+script: "{{ path }}/script.sh"
+root_password: "changeme"
+
+arch: "linux-amd64"
+bin_path: "/usr/local/bin"
+tmp_path: "/tmp"

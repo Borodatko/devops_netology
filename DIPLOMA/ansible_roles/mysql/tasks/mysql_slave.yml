@@ -1,0 +1,59 @@
+---
+
+- name: Slave - Copy my.cnf on Slave
+  become: true
+  ansible.builtin.template:
+    src: slave_my.cnf.j2
+    dest: "{{ cnf_path }}/my.cnf"
+    mode: '644'
+  notify:
+    - Restart MySQL
+  tags: mysql
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Slave - Get data from master file and position
+  community.mysql.mysql_replication:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: localhost
+    mode: getmaster
+  register: master_data
+  tags: mysql
+
+- block:
+    - name: Slave - Config slave
+      community.mysql.mysql_replication:
+        login_user: root
+        login_password: "{{ root_password }}"
+        login_host: localhost
+        mode: changemaster
+        master_host: "{{ primary_host }}"
+        master_user: "{{ replica_user }}"
+        master_password: "{{ replica_pass }}"
+        master_log_file: "{{ master_data.File }}"
+        master_log_pos: "{{ master_data.Position }}"
+      register: result
+      failed_when: result.msg == -1
+  rescue:
+    - name: Slave - Config slave
+      community.mysql.mysql_replication:
+        login_user: root
+        login_password: "{{ root_password }}"
+        login_host: localhost
+        mode: changemaster
+        master_host: "{{ primary_host }}"
+        master_user: "{{ replica_user }}"
+        master_password: "{{ replica_pass }}"
+        master_log_file: "{{ master_data.File }}"
+        master_log_pos: "{{ master_data.Position }}"
+  tags: mysql
+
+- name: Slave - Start slave
+  community.mysql.mysql_replication:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: localhost
+    mode: startslave
+  tags: mysql
