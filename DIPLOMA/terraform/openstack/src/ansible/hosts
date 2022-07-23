@@ -1,0 +1,8 @@
+127.0.0.1	localhost
+10.20.100.150	www.test.lab		www
+10.20.100.151	db1.test.lab		db1
+10.20.100.152	db2.test.lab		db2
+10.20.100.153	app.test.lab		app
+10.20.100.154	gitlab.test.lab		gitlab
+10.20.100.155	runner.test.lab		runner
+10.20.100.156	monitoring.test.lab	monitoring

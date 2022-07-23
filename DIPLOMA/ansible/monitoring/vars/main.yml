@@ -1,0 +1,44 @@
+---
+# vars file for monitoring
+
+# prometheus.yml
+prometheus_version: "2.37.0-rc.0"
+prometheus_archive: "{{ tmp_path }}/prometheus-{{ prometheus_version }}.{{ arch }}.tar.gz"
+prometheus_path_tmp: "{{ tmp_path }}/prometheus-{{ prometheus_version }}.{{ arch }}"
+prometheus_path_conf: "/etc/prometheus"
+prometheus_path_db: "/var/lib/prometheus"
+
+# alertmanager.yml
+alertmanager_version: "0.24.0"
+alertmanager_archive: "{{ tmp_path }}/alertmanager-{{ alertmanager_version }}.{{ arch }}.tar.gz"
+alertmanager_path_tmp: "{{ tmp_path }}/alertmanager-{{ alertmanager_version }}.{{ arch }}"
+alertmanager_path_conf: /etc/alertmanager
+
+# exporter.yml
+node_exporter_version: "1.3.1"
+node_exporter_archive: "{{ tmp_path }}/node_exporter-{{ node_exporter_version }}.{{ arch }}.tar.gz"
+node_exporter_path_tmp: "{{ tmp_path }}/node_exporter-{{ node_exporter_version }}.{{ arch }}"
+systemd_path: "/etc/systemd/system"
+
+# grafana.yml
+repo_path: "/etc/yum.repos.d"
+grafuser: "admin"
+grafpassword: "admin"
+
+# prometheus.yml.j2
+host_nginx: "10.20.100.150"
+host_db1: "10.20.100.151"
+host_db2: "10.20.100.152"
+host_app: "10.20.100.153"
+host_gitlab: "10.20.100.154"
+host_runner: "10.20.100.155"
+host_database: "10.20.100.151"
+
+# alertmanager.yml.j2
+
+email_recepient: ""
+email_sender: ""
+email_smtp_server: ""
+email_auth_username: ""
+email_auth_identity: ""
+email_auth_password: ""

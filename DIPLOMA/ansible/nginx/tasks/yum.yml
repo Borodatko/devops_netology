@@ -1,0 +1,23 @@
+---
+- name: Yum - edit yum.conf
+  become: yes
+  lineinfile:
+    dest: /etc/yum.conf
+    line: "http_caching=none"
+
+- name: Yum - Add Nginx Repo
+  become: true
+  ansible.builtin.template:
+    src: nginx-stable.repo.j2
+    dest: "{{ repo_path }}/nginx-stable.repo"
+    mode: '644'
+  tags: nginx
+
+- name: Yum - Install Packages
+  become: true
+  yum:
+    name:
+      - nginx
+    state: latest
+  tags: nginx
+

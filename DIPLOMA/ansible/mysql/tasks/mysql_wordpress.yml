@@ -1,0 +1,23 @@
+---
+- name: Wordpress - Create Database wordpress
+  community.mysql.mysql_db:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: localhost
+    name: "{{ db_name }}"
+    state: present
+  tags: mysql
+
+- name: Wordpress - Create User wordpress
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: localhost
+    name: "{{ db_username }}"
+    password: "{{ db_password }}"
+    host: "{{ db_host }}"
+    priv:
+      'wordpress.*': 'ALL,GRANT'
+    state: present
+  tags: mysql
+

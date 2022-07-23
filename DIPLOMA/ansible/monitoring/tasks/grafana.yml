@@ -1,0 +1,67 @@
+---
+
+- name: Grafana - Add repo file
+  become: true
+  ansible.builtin.template:
+    src: grafana.repo.j2
+    dest: "{{ repo_path }}/grafana.repo"
+    mode: '644'
+  tags: monitoring
+
+- name: Grafana - Install package
+  become: true
+  ansible.builtin.yum:
+    name:
+      - grafana
+    state: latest
+  notify:
+    - Start grafana
+  tags: monitoring
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Grafana - Add datasource
+  community.grafana.grafana_datasource:
+    name: Prometheus
+    grafana_url: http://localhost:3000
+    grafana_user: "{{ grafuser }}"
+    grafana_password: "{{ grafpassword }}"
+    ds_type: prometheus
+    ds_url: http://localhost:9090
+    access: proxy
+    state: present
+  register: result
+  tags: monitoring
+
+- name: Grafana - Copy Node Exporter Dashboard
+  ansible.builtin.copy:
+    src: files/node-exporter-full.json
+    dest: "{{ tmp_path }}/node-exporter-full.json"
+  tags: monitoring
+
+- name: Grafana - Import Node Exporter Dashboard
+  community.grafana.grafana_dashboard:
+    grafana_url: http://localhost:3000
+    grafana_user: "{{ grafuser }}"
+    grafana_password: "{{ grafpassword }}"
+    state: present
+    overwrite: true
+    path: "{{ tmp_path }}/node-exporter-full.json"
+  tags: monitoring
+
+- name: Grafana - Copy Mysqld Exporter Dashboard
+  ansible.builtin.copy:
+    src: files/mysql-overview.json
+    dest: "{{ tmp_path }}/mysql-overview.json"
+  tags: monitoring
+
+- name: Grafana - Import Mysqld Exporter Dashboard
+  community.grafana.grafana_dashboard:
+    grafana_url: http://localhost:3000
+    grafana_user: "{{ grafuser }}"
+    grafana_password: "{{ grafpassword }}"
+    state: present
+    overwrite: true
+    path: "{{ tmp_path }}/mysql-overview.json"
+  tags: monitoring

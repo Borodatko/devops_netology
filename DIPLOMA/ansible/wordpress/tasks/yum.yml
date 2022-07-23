@@ -1,0 +1,68 @@
+---
+# tasks file for wordpress
+
+- name: Yum - Install EPEL
+  become: true
+  ansible.builtin.yum:
+    name:
+      - epel-release
+    state: latest
+  tags: wordpress
+
+- name: Yum - Get Remi release
+  ansible.builtin.get_url:
+    url: "{{ repo_url }}"
+    dest: "{{ rpm_package }}"
+  tags: wordpress
+
+- name: Yum - Install package
+  become: true
+  ansible.builtin.yum:
+    name: "{{ rpm_package }}"
+    state: present
+  tags: wordpress
+
+- name: Yum - edit yum.conf
+  become: yes
+  lineinfile:
+    dest: /etc/yum.conf
+    line: "http_caching=none"
+
+- name: Yum - Add Nginx Repo
+  become: true
+  ansible.builtin.template:
+    src: nginx-stable.repo.j2
+    dest: "{{ repo_path }}/nginx-stable.repo"
+    mode: '644'
+  tags: wordpress
+
+- name: Yum - Install Nginx
+  become: true
+  ansible.builtin.yum:
+    name:
+      - nginx
+    enablerepo: nginx-stable
+    state: latest
+  tags: wordpress
+
+- name: Yum - Install PHP & Git Packages
+  become: true
+  ansible.builtin.yum:
+    name:
+      - git
+      - php
+      - php-bz2
+      - php-mysql
+      - php-curl
+      - php-gd
+      - php-intl
+      - php-common
+      - php-mbstring
+      - php-xml
+      - php-cli
+      - php-fpm
+      - php-json
+      - php-opcache
+    enablerepo: base,remi-php72
+    state: latest
+  tags: wordpress

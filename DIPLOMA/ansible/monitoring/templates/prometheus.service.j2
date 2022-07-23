@@ -1,0 +1,20 @@
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart={{ bin_path }}/prometheus \
+  --config.file {{ prometheus_path_conf }}/prometheus.yml \
+  --storage.tsdb.path {{ prometheus_path_db }} \
+  --web.console.templates={{ prometheus_path_conf }}/consoles \
+  --web.console.libraries={{ prometheus_path_conf }}/console_libraries
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

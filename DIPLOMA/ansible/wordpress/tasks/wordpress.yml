@@ -1,0 +1,89 @@
+---
+
+- name: Wordpress - Get archive
+  ansible.builtin.get_url:
+    url: "http://wordpress.org/wordpress-{{ wordpress_version }}.tar.gz"
+    dest: "{{ tmp_path }}"
+  tags: wordpress
+
+- name: Wordpress - Extract archive
+  ansible.builtin.unarchive:
+    src: "{{ wordpress_archive }}"
+    dest: "{{ tmp_path }}"
+    remote_src: yes
+  tags: wordpress
+
+- name: Wordpress - Copy WP files
+  become: true
+  ansible.builtin.copy:
+    src: "{{ wordpress_tmp_path }}/"
+    dest: "{{ www_path }}/"
+    remote_src: true
+  tags: wordpress
+
+- name: Wordpress - Create uploads directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ upload_dir }}"
+    state: directory
+    mode: '0755'
+    owner: nginx
+    group: nginx
+  tags: wordpress
+
+- name: Wordpress - Change permissions
+  become: true
+  ansible.builtin.file:
+    path: "{{ www_path }}"
+    state: directory
+    recurse: yes
+    owner: nginx
+    group: nginx
+  tags: wordpress
+
+- name: Wordpress - Copy config file
+  become: true
+  ansible.builtin.template:
+    src: wp-config.php.j2
+    dest: "{{ www_path }}/wp-config.php"
+    mode: '644'
+    owner: nginx
+    group: nginx
+  tags: wordpress
+
+- name: Wordpress - Copy nginx config file
+  become: true
+  ansible.builtin.template:
+    src: default.conf.j2
+    dest: "{{ nginx_path }}/default.conf"
+    mode: '644'
+  notify:
+    - Restart nginx
+  tags: wordpress
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Wordpress - Get wp-cli
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ wp_url }}"
+    dest: "{{ bin_path }}/wp"
+    mode: '755'
+  tags: wordpress
+
+- name: Wordpress - Modify permissions
+  become: true
+  ansible.builtin.file:
+    path: "{{ www_path }}"
+    state: directory
+    recurse: yes
+    mode: '0775'
+  tags: wordpress
+    
+- name: Wordpress - Add user to group nginx
+  become: true
+  ansible.builtin.user:
+    name: "{{ username }}"
+    group: nginx
+  tags: wordpress

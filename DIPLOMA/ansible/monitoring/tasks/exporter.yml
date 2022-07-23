@@ -1,0 +1,41 @@
+---
+
+- name: NodeExporter - Get release
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.{{ arch }}.tar.gz"
+    dest: "{{ node_exporter_archive }}"
+  tags: monitoring
+
+- name: NodeExporter - Extract archive
+  ansible.builtin.unarchive:
+    src: "{{ node_exporter_archive }}"
+    dest: "{{ tmp_path }}"
+    remote_src: yes
+  tags: monitoring
+
+- name: NodeExporter - Copy binaries to "{{ bin_path }}"
+  become: true
+  ansible.builtin.copy:
+    src: "{{ node_exporter_path_tmp }}/{{ item }}"
+    dest: "{{ bin_path }}"
+    remote_src: yes
+    mode: '0755'
+    owner: prometheus
+    group: prometheus
+  with_items:
+    - node_exporter
+  tags: monitoring
+
+- name: NodeExporter - Add Unit file
+  become: true
+  ansible.builtin.template:
+    src: node_exporter.service.j2
+    dest: "{{ systemd_path }}/node_exporter.service"
+    mode: '644'
+  notify:
+    - Reload daemon
+    - Start node_exporter
+  tags: monitoring
+
+- name: Flush handlers
+  meta: flush_handlers

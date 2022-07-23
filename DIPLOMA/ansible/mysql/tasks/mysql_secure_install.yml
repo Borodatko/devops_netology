@@ -1,0 +1,95 @@
+---
+
+- name: Secure Install - Copy my.cnf
+  become: true
+  ansible.builtin.template:
+    src: my.cnf.j2
+    dest: "{{ cnf_path }}/my.cnf"
+    mode: '644'
+  notify:
+    - Start MySQL
+  tags: mysql
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Secure Install - Copy shell-script
+  become: true
+  ansible.builtin.template:
+    src: script.sh.j2
+    dest: "{{ tmp_path }}/script.sh"
+    mode: '755'
+  tags: mysql
+
+- name: Secure Install - Get temporary root password
+  become: true
+  command: "{{ script }}"
+  register: password
+
+- name: Secure Install - Set root password
+  command: 'mysql --user root --password="{{ password.stdout }}" --connect-expired-password --execute="{{ item }}"'
+  with_items:
+    - ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ root_password }}';
+    - ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '{{ root_password }}';
+  register: result
+  failed_when: result.stderr == 28000
+  changed_when: false
+  tags: mysql
+
+- name: Secure Install - Remove anonymous users
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: "{{ item }}"
+    name: ""
+    state: absent
+  with_items:
+    - localhost
+    - 127.0.0.1
+  tags: mysql
+
+- name: Secure Install - Disallow root login remotely
+  community.mysql.mysql_query:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: "{{ item }}"
+    login_db: mysql
+    query: DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1')
+  with_items:
+    - localhost
+    - 127.0.0.1
+  tags: mysql
+
+- name: Secure Install - Removes the MySQL test database
+  community.mysql.mysql_db:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: "{{ item }}"
+    name: test
+    state: absent
+  with_items:
+    - localhost
+    - 127.0.0.1
+  tags: mysql
+
+- name: Secure Install - Reload privilege tables
+  community.mysql.mysql_query:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: "{{ item }}"
+    login_db: mysql
+    query: FLUSH PRIVILEGES
+  with_items:
+    - localhost
+    - 127.0.0.1
+  tags: mysql
+
+- name: Secure Install - Create mysql directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ log_path }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ user }}"
+    group: "{{ user }}"
+  tags: mysql

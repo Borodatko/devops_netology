@@ -1,0 +1,59 @@
+---
+
+- name: MysqldExporter - Get release
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/mysqld_exporter/releases/download/v{{ mysqld_exporter_version }}/mysqld_exporter-{{ mysqld_exporter_version }}.{{ arch }}.tar.gz"
+    dest: "{{ mysqld_exporter_archive }}"
+  tags: monitoring
+
+- name: MysqldExporter - Extract archive
+  ansible.builtin.unarchive:
+    src: "{{ mysqld_exporter_archive }}"
+    dest: "{{ tmp_path }}"
+    remote_src: yes
+  tags: monitoring
+
+- name: MysqldExporter - Copy binaries to "{{ bin_path }}"
+  become: true
+  ansible.builtin.copy:
+    src: "{{ mysqld_exporter_path_tmp }}/{{ item }}"
+    dest: "{{ bin_path }}"
+    remote_src: yes
+    mode: '0755'
+  with_items:
+    - mysqld_exporter
+  tags: monitoring
+
+- name: MysqldExporter - Create user
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: localhost
+    name: "{{ mysql_user }}"
+    password: "{{ mysql_pass }}"
+    host: localhost
+    priv: '*.*:PROCESS,REPLICATION CLIENT,SELECT'
+    state: present
+  tags: mysql
+
+- name: MysqldExporter - Copy cnf file
+  become: true
+  ansible.builtin.template:
+    src: mysqld_exporter.cnf.j2
+    dest: "{{ cnf_path }}/.mysqld_exporter.cnf"
+    mode: '640'
+  tags: mysql
+
+- name: MysqldExporter - Add Unit file
+  become: true
+  ansible.builtin.template:
+    src: mysqld_exporter.service.j2
+    dest: "{{ systemd_path }}/mysqld_exporter.service"
+    mode: '644'
+  notify:
+    - Reload daemon
+    - Start mysqld_exporter
+  tags: monitoring
+
+- name: Flush handlers
+  meta: flush_handlers

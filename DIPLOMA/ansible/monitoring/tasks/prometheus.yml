@@ -1,0 +1,96 @@
+---
+
+- name: Prometheus - Get release
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.{{ arch }}.tar.gz"
+    dest: "{{ prometheus_archive }}"
+  tags: monitoring
+
+- name: Prometheus - Add user
+  become: true
+  ansible.builtin.user:
+    name: prometheus
+    shell: /bin/false
+    create_home: no
+  tags: monitoring
+
+- name: Prometheus - Create directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: prometheus
+    group: prometheus
+  with_items:
+    - "{{ prometheus_path_conf }}"
+    - "{{ prometheus_path_db }}"
+  tags: monitoring
+
+- name: Prometheus - Extract archive
+  ansible.builtin.unarchive:
+    src: "{{ prometheus_archive }}"
+    dest: "{{ tmp_path }}"
+    remote_src: true
+  tags: monitoring
+
+- name: Prometheus - Copy bianries to "{{ bin_path }}"
+  become: true
+  ansible.builtin.copy:
+    src: "{{ prometheus_path_tmp }}/{{ item }}"
+    dest: "{{ bin_path }}"
+    remote_src: yes
+    mode: '0755'
+    owner: prometheus
+    group: prometheus
+  with_items:
+    - prometheus
+    - promtool
+  tags: monitoring
+
+- name: Prometheus - Copy directories to "{{ prometheus_path_conf }}"
+  become: true
+  ansible.builtin.copy:
+    src: "{{ prometheus_path_tmp }}/{{ item }}"
+    dest: "{{ prometheus_path_conf }}/"
+    remote_src: yes
+    owner: prometheus
+    group: prometheus
+  with_items:
+    - consoles
+    - console_libraries
+  tags: monitoring
+
+- name: Prometheus - Add config file
+  become: true
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: "{{ prometheus_path_conf }}/prometheus.yml"
+    mode: '644'
+    owner: prometheus
+    group: prometheus
+  tags: monitoring
+
+- name: Prometheus - Add rules
+  become: true
+  ansible.builtin.copy:
+    src: /home/dorlov/ansible/diploma/monitoring/templates/rules.yml
+    dest: "{{ prometheus_path_conf }}/rules.yml"
+    mode: '644'
+    owner: prometheus
+    group: prometheus
+  tags: monitoring
+
+- name: Prometheus - Add Unit file
+  become: true
+  ansible.builtin.template:
+    src: prometheus.service.j2
+    dest: "/etc/systemd/system/prometheus.service"
+    mode: '644'
+  notify:
+    - Reload daemon
+    - Start prometheus
+  tags: monitoring
+
+- name: Flush handlers
+  meta: flush_handlers

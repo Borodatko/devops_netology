@@ -1,0 +1,36 @@
+---
+
+- name: Yum - Install packages
+  become: true
+  ansible.builtin.yum:
+    name:
+      - policycoreutils
+      - policycoreutils-python
+      - postfix
+    state: latest
+  notify:
+    - Start postfix
+  tags: gitlab
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Yum - Get repo
+  ansible.builtin.get_url:
+    url: "{{ ce_url }}"
+    dest: "{{ tmp_path }}/script.rpm.sh"
+    mode: '0755'
+  tags: gitlab
+
+- name: Yum - Install repo
+  become: true
+  ansible.builtin.command: "{{ tmp_path }}/script.rpm.sh"
+  tags: gitlab
+
+- name: Yum - Install GitLab CE
+  become: true
+  ansible.builtin.yum:
+    name: 
+      - gitlab-ce
+    state: latest
+  tags: gitlab

@@ -1,0 +1,19 @@
+upstream www.upstream {
+        server {{ ip_upstream_www }}:80;
+}
+
+upstream gitlab.upstream {
+        server {{ ip_upstream_gitlab }}:80;
+}
+
+upstream prometheus.upstream {
+        server {{ ip_upstream_prometheus }}:9090;
+}
+
+upstream alertmanager.upstream {
+        server {{ ip_upstream_alertmanager }}:9093;
+}
+
+upstream grafana.upstream {
+        server {{ ip_upstream_grafana }}:3000;
+}

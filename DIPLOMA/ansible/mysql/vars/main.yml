@@ -1,0 +1,29 @@
+---
+# vars file for mysql
+
+# yum.yml
+md5: "62f64deae31dcc2399a0ebe05366498f"
+repo_url: "https://dev.mysql.com/get/mysql80-community-release-el7-6.noarch.rpm"
+rpm_path: "/tmp/mysql80-community-release-el7-6.noarch.rpm"
+gpg_url: "https://repo.mysql.com/RPM-GPG-KEY-mysql-2022"
+
+# mysql_master.yml mysql_slave.yml
+log_path: "/var/log/mysql"
+user: "mysql"
+replica_user: "replman"
+replica_pass: "qazQAZ"
+replica_host: "10.20.100.152"
+primary_host: "10.20.100.151"
+
+# mysql_wordpress.yml
+db_name: wordpress
+db_username: "wordpress"
+db_password: "wordpress"
+db_host: "10.20.100.153"
+
+# mysqld_exporter.yml
+mysqld_exporter_version: "0.14.0"
+mysqld_exporter_archive: "{{ tmp_path }}/mysqld_exporter-{{ mysqld_exporter_version }}.{{ arch }}.tar.gz"
+mysqld_exporter_path_tmp: "{{ tmp_path }}/mysqld_exporter-{{ mysqld_exporter_version }}.{{ arch }}"
+mysql_user: "mysqld_exporter"
+mysql_pass: "1qaz@WSX3edc"

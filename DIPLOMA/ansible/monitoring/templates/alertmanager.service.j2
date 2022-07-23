@@ -1,0 +1,19 @@
+[Unit]
+Description=Alertmanager
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+WorkingDirectory={{ alertmanager_path_conf }}
+ExecStart={{ bin_path }}/alertmanager \
+  --config.file={{ alertmanager_path_conf }}/alertmanager.yml \
+  --storage.path={{ alertmanager_path_conf }}/data
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

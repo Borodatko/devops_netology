@@ -1,0 +1,15 @@
+---
+# tasks file for monitoring
+
+- include_tasks: prometheus.yml
+  tags: [always]
+
+- include_tasks: alertmanager.yml
+  tags: [always]
+
+- include_tasks: exporter.yml
+  tags: [always]
+
+- include_tasks: grafana.yml
+  tags: [always]
+

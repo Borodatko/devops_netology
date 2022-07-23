@@ -1,0 +1,29 @@
+---
+# tasks file for mysql
+
+- include_tasks: yum.yml
+  tags: [always]
+
+- include_tasks: mysql_secure_install.yml
+  tags: [always]
+
+- include_tasks: mysql_master.yml
+  when:
+    inventory_hostname == "db01"
+  tags: [always]
+
+- include_tasks: mysql_slave.yml
+  when:
+    inventory_hostname == "db02"
+  tags: [always]
+
+- include_tasks: mysql_wordpress.yml
+  when:
+    inventory_hostname == "db01"
+  tags: [always]
+
+- include_tasks: exporter.yml
+  tags: [always]
+
+- include_tasks: mysqld_exporter.yml
+  tags: [always]

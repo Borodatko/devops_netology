@@ -1,0 +1,7 @@
+---
+# defaults file for gitlab
+
+arch: "linux-amd64"
+bin_path: "/usr/local/bin"
+tmp_path: "/tmp"
+

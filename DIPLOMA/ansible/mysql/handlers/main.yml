@@ -1,0 +1,46 @@
+---
+# handlers file for mysql
+- name: Reload daemon
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Start MySQL
+  become: true
+  ansible.builtin.systemd:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: Restart MySQL
+  become: true
+  ansible.builtin.systemd:
+    name: mysqld
+    state: restarted
+
+- name: Start node_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: node_exporter
+    state: started
+    enabled: yes
+
+- name: Restart node_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: node_exporter
+    state: restarted
+
+- name: Start mysqld_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: mysqld_exporter
+    state: started
+    enabled: yes
+
+- name: Restart mysqld_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: mysqld_exporter
+    state: restarted
+

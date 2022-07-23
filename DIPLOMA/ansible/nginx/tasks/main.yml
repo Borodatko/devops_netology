@@ -1,0 +1,15 @@
+---
+# tasks file for nginx
+
+- include_tasks: yum.yml
+  tags: [always]
+
+- include_tasks: nginx.yml
+  tags: [always]
+
+#- include_tasks: letsencrypt.yml
+#  tags: [always]
+
+- include_tasks: exporter.yml
+  tags: [always]
+

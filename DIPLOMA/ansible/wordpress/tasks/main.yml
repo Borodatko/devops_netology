@@ -1,0 +1,21 @@
+---
+# tasks file for wordpress
+
+- name: SSH - Create keys
+  ansible.builtin.user:
+    name: netology
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+
+- include_tasks: yum.yml
+  tags: [always]
+
+- include_tasks: php.yml
+  tags: [always]
+
+- include_tasks: wordpress.yml
+  tags: [always]
+
+- include_tasks: exporter.yml
+  tags: [always]

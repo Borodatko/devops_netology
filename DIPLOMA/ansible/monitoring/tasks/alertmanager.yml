@@ -1,0 +1,62 @@
+---
+
+- name: AlertManager - Get release
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/alertmanager-{{ alertmanager_version }}.{{ arch }}.tar.gz"
+    dest: "{{ alertmanager_archive }}"
+  tags: monitoring
+
+- name: AlertManager - Create directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ alertmanager_path_conf }}"
+    state: directory
+    mode: '0755'
+    owner: prometheus
+    group: prometheus
+  tags: monitoring
+
+- name: AlertManager - Extract archive
+  ansible.builtin.unarchive:
+    src: "{{ alertmanager_archive }}"
+    dest: "{{ tmp_path }}"
+    remote_src: yes
+  tags: monitoring
+
+- name: AlertManager - Copy binaries to "{{ bin_path }}"
+  become: true
+  ansible.builtin.copy:
+    src: "{{ alertmanager_path_tmp }}/{{ item }}"
+    dest: "{{ bin_path }}"
+    remote_src: yes
+    mode: '0755'
+    owner: prometheus
+    group: prometheus
+  with_items:
+    - alertmanager
+    - amtool
+  tags: monitoring
+
+- name: AlertManager - Add config file
+  become: true
+  ansible.builtin.template:
+    src: alertmanager.yml.j2
+    dest: "{{ alertmanager_path_conf }}/alertmanager.yml"
+    mode: '644'
+    owner: prometheus
+    group: prometheus
+  tags: monitoring
+
+- name: AlertManager - Add Unit file
+  become: true
+  ansible.builtin.template:
+    src: alertmanager.service.j2
+    dest: "/etc/systemd/system/alertmanager.service"
+    mode: '644'
+  notify:
+    - Reload daemon
+    - Start alertmanager
+  tags: monitoring
+
+- name: Flush handlers
+  meta: flush_handlers
