@@ -1,25 +1,25 @@
 ---
-#- name: MySQL Provisioning
-#  hosts: mysql
-#  roles:
-#    - mysql
+- name: MySQL Provisioning
+  hosts: mysql
+  roles:
+    - mysql
 
-#- name: Wordpress Provisioning
-#  hosts: wordpress
-#  roles:
-#    - wordpress
+- name: Wordpress Provisioning
+  hosts: wordpress
+  roles:
+    - wordpress
 
 - name: Monitoring Provisioning
   hosts: monitoring
   roles:
     - monitoring
 
-#- name: Nginx Provisioning
-#  hosts: nginx
-#  roles:
-#    - nginx
+- name: Nginx Provisioning
+  hosts: nginx
+  roles:
+    - nginx
 
-#- name: GitLab Provisioning
-#  hosts: gitlab
-#  roles:
-#    - gitlab
+- name: GitLab Provisioning
+  hosts: gitlab
+  roles:
+    - gitlab

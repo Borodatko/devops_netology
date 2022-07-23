@@ -9,14 +9,14 @@
     state: latest
   tags: gitlab
 
-- name: Yum - Get repo
+- name: Yum - Get Git Runner repo
   ansible.builtin.get_url:
     url: "{{ runner_url }}"
     dest: "{{ tmp_path }}/script.rpm.sh"
     mode: '0755'
   tags: gitlab
 
-- name: Yum - Install repo
+- name: Yum - Install Git Runner repo
   become: true
   ansible.builtin.command: "{{ tmp_path }}/script.rpm.sh"
   tags: gitlab

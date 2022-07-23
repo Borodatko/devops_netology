@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 Type=simple
-ExecStart={{ bin_path }}/mysqld_exporter
+ExecStart={{ bin_path }}/mysqld_exporter --config.my-cnf {{ cnf_path }}/.mysqld_exporter.cnf
 ExecReload=/bin/kill -HUP \$MAINPID
 KillMode=process
 Restart=on-failure

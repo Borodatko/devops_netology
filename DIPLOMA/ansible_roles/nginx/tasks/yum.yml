@@ -1,4 +1,9 @@
 ---
+- name: Yum - edit yum.conf
+  become: yes
+  lineinfile:
+    dest: /etc/yum.conf
+    line: "http_caching=none"
 
 - name: Yum - Add Nginx Repo
   become: true

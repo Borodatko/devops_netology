@@ -1,38 +1,65 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Ansible role for Prometheus, Alert Manager, Grafana installation & configuration.
 
-Requirements
-------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+| Name | Description | Type | Default Value|
+|------|-------------|------|---------|
+| arch | architecture  | string | linux-amd64 |
+| bin_path | path to binary  | string | /usr/local/bin |
+| tmp_path | temporary path  | string | /tmp |
+| prometheus_version | prometheus version | string | 2.37.0-rc.0 |
+| prometheus_archive | prometheus downloaded archive | string | {{ tmp_path }}/prometheus-{{ prometheus_version }}.{{ arch }}.tar.gz |
+| prometheus_path_tmp | prometheus temporary path | string | {{ tmp_path }}/prometheus-{{ prometheus_version }}.{{ arch }} |
+| prometheus_path_conf | prometheus config file path | string | /etc/prometheus |
+| prometheus_path_db | prometheus database path | string | /var/lib/prometheus |
+| alertmanager_version | alertmanager version | string | 0.24.0 |
+| alertmanager_archive | alertmanager downloaded archive | string | {{ tmp_path }}/alertmanager-{{ alertmanager_version }}.{{ arch }}.tar.gz |
+| alertmanager_path_tmp | alertmanager temporary path | string | {{ tmp_path }}/alertmanager-{{ alertmanager_version }}.{{ arch }} |
+| alertmanager_path_conf | alertmanager config file path | string | /etc/alertmanager |
+| node_exporter_version | prometheus node exporter version | string | 1.3.1 |
+| node_exporter_archive | downloaded archive | string | {{ tmp_path }}/node_exporter-{{ node_exporter_version }}.{{ arch }}.tar.gz |
+| node_exporter_path_tmp | temporary path | string | {{ tmp_path }}/node_exporter-{{ node_exporter_version }}.{{ arch }} |
+| systemd_path | systemd unit file path | string | /etc/systemd/system |
+| repo_path | path to repositories directory | string | /etc/yum.repos.d |
+| grafuser | grafana user | string | admin |
+| grafpassword | grafana password | string | admin |
+| host_nginx | server ip address (nginx) | string | changeme |
+| host_db1 | server ip address (mysql_master) | string | changeme |
+| host_db2 | server ip address (mysql_slave) | string | changeme |
+| host_app | server ip address (wordpress) | string | changeme |
+| host_gitlab | server ip address (gitlab-ce) | string | changeme |
+| host_runner | server ip address (gitlab-runner) | string | changeme |
+| host_database | server ip address (mysql_master) | string | changeme |
+| email_recepient | recepient's address | string | changeme |
+| email_sender | sender's address | string | changeme |
+| email_smtp_server | smtp server address | string | changeme |
+| email_auth_username | smtp auth username | string | changeme |
+| email_auth_identity | smtp auth identity | string | changeme |
+| email_auth_password | smtp auth password | string | changeme |
 
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```yaml
+- name: Monitoring Provisioning
+  hosts: monitoring
+  roles:
+    - monitoring
+```
 
 License
 -------
 
-BSD
+BSD-3-Clause
+
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Borodatko

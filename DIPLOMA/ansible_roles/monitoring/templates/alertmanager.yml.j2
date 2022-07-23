@@ -7,12 +7,12 @@ route:
 receivers:
   - name: 'email'
     email_configs:
-    - to: ''
-      from: ''
-      smarthost: smtp.gmail.com:587
-      auth_username: ''
-      auth_identity: ''
-      auth_password: ''
+    - to: '{{ email_recepient }}'
+      from: '{{ email_sender }}'
+      smarthost: {{ email_smtp_server }}
+      auth_username: '{{ email_auth_username }}'
+      auth_identity: '{{ email_auth_identity }}'
+      auth_password: '{{ email_auth_password }}'
 inhibit_rules:
   - source_match:
       severity: 'critical'

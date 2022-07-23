@@ -1,6 +1,4 @@
 ---
-#mysql:
-#https://github.com/prometheus/mysqld_exporter/releases/download/v0.14.0/mysqld_exporter-0.14.0.linux-amd64.tar.gz
 
 - name: MysqldExporter - Get release
   ansible.builtin.get_url:
@@ -26,11 +24,31 @@
     - mysqld_exporter
   tags: monitoring
 
+- name: MysqldExporter - Create user
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: localhost
+    name: "{{ mysql_user }}"
+    password: "{{ mysql_pass }}"
+    host: localhost
+    priv: '*.*:PROCESS,REPLICATION CLIENT,SELECT'
+    state: present
+  tags: mysql
+
+- name: MysqldExporter - Copy cnf file
+  become: true
+  ansible.builtin.template:
+    src: mysqld_exporter.cnf.j2
+    dest: "{{ cnf_path }}/.mysqld_exporter.cnf"
+    mode: '640'
+  tags: mysql
+
 - name: MysqldExporter - Add Unit file
   become: true
   ansible.builtin.template:
     src: mysqld_exporter.service.j2
-    dest: "/etc/systemd/system/mysqld_exporter.service"
+    dest: "{{ systemd_path }}/mysqld_exporter.service"
     mode: '644'
   notify:
     - Reload daemon

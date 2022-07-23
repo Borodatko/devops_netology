@@ -25,29 +25,35 @@ scrape_configs:
   - job_name: 'nginx'
     scrape_interval: 5s
     static_configs:
-      - targets: ['10.20.100.150:9100']
+      - targets: ['{{ host_nginx }}:9100']
 
   - job_name: 'db1'
     scrape_interval: 5s
     static_configs:
-      - targets: ['10.20.100.151:9100']
+      - targets: ['{{ host_db1 }}:9100']
 
   - job_name: 'db2'
     scrape_interval: 5s
     static_configs:
-      - targets: ['10.20.100.152:9100']
+      - targets: ['{{ host_db2 }}:9100']
 
   - job_name: 'app'
     scrape_interval: 5s
     static_configs:
-      - targets: ['10.20.100.153:9100']
+      - targets: ['{{ host_app }}:9100']
 
   - job_name: 'gitlab'
     scrape_interval: 5s
     static_configs:
-      - targets: ['10.20.100.154:9101']
+      - targets: ['{{ host_gitlab }}:9101']
 
   - job_name: 'runner'
     scrape_interval: 5s
     static_configs:
-      - targets: ['10.20.100.155:9101']
+      - targets: ['{{ host_runner }}:9101']
+
+  - job_name: 'database'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['{{ host_database }}:9104']
+

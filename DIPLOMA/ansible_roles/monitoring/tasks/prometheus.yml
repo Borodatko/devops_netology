@@ -71,6 +71,16 @@
     group: prometheus
   tags: monitoring
 
+- name: Prometheus - Add rules
+  become: true
+  ansible.builtin.copy:
+    src: /home/dorlov/ansible/diploma/monitoring/templates/rules.yml
+    dest: "{{ prometheus_path_conf }}/rules.yml"
+    mode: '644'
+    owner: prometheus
+    group: prometheus
+  tags: monitoring
+
 - name: Prometheus - Add Unit file
   become: true
   ansible.builtin.template:

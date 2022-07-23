@@ -1,6 +1,6 @@
 galaxy_info:
   author: Borodatko
-  description: Install MySQL and configure DB replication.
+  description: Ansible role for MySQL cluster installation & configuration.
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value

@@ -22,6 +22,12 @@
     state: present
   tags: wordpress
 
+- name: Yum - edit yum.conf
+  become: yes
+  lineinfile:
+    dest: /etc/yum.conf
+    line: "http_caching=none"
+
 - name: Yum - Add Nginx Repo
   become: true
   ansible.builtin.template:
@@ -30,18 +36,20 @@
     mode: '644'
   tags: wordpress
 
-- name: Yum - Install Packages
-  become: true
-  yum:
-    name:
-      - nginx
-    state: latest
-  tags: wordpress
-
-- name: Yum - Install PHP
+- name: Yum - Install Nginx
   become: true
   ansible.builtin.yum:
     name:
+      - nginx
+    enablerepo: nginx-stable
+    state: latest
+  tags: wordpress
+
+- name: Yum - Install PHP & Git Packages
+  become: true
+  ansible.builtin.yum:
+    name:
+      - git
       - php
       - php-bz2
       - php-mysql

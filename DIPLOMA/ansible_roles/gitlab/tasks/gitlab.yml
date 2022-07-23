@@ -1,8 +1,9 @@
 ---
+
 - name: GitLab CE - Replace external url
   become: true
   ansible.builtin.replace:
-    path: /etc/gitlab/gitlab.rb
+    path: "{{ gitlab_conf }}"
     regexp: external_url 'http://gitlab.example.com'
     replace: external_url 'http://{{ gitlab_ip }}'
   tags: gitlab
@@ -10,7 +11,7 @@
 - name: Update GitLab Config
   become: yes
   ansible.builtin.lineinfile:
-    dest: /etc/gitlab/gitlab.rb
+    dest: "{{ gitlab_conf }}"
     line: "{{ item }}"
   with_items:
     - gitlab_rails['initial_root_password'] = "{{ gitlab_root_password }}"

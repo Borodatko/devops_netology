@@ -17,7 +17,7 @@
   become: true
   ansible.builtin.template:
     src: script.sh.j2
-    dest: "{{ path }}/script.sh"
+    dest: "{{ tmp_path }}/script.sh"
     mode: '755'
   tags: mysql
 

@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 Type=simple
-ExecStart={{ bin_path }}/node_exporter
+ExecStart={{ bin_path }}/node_exporter --web.listen-address=:9101
 ExecReload=/bin/kill -HUP \$MAINPID
 KillMode=process
 Restart=on-failure

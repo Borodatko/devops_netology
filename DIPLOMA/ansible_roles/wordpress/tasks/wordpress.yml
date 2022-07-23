@@ -63,3 +63,27 @@
 
 - name: Flush handlers
   meta: flush_handlers
+
+- name: Wordpress - Get wp-cli
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ wp_url }}"
+    dest: "{{ bin_path }}/wp"
+    mode: '755'
+  tags: wordpress
+
+- name: Wordpress - Modify permissions
+  become: true
+  ansible.builtin.file:
+    path: "{{ www_path }}"
+    state: directory
+    recurse: yes
+    mode: '0775'
+  tags: wordpress
+    
+- name: Wordpress - Add user to group nginx
+  become: true
+  ansible.builtin.user:
+    name: "{{ username }}"
+    group: nginx
+  tags: wordpress
