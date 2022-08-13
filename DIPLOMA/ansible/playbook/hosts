@@ -1,9 +1,0 @@
-127.0.0.1	localhost
-10.20.100.150	tst2022.ru		nginx
-10.20.100.151	db01.tst2022.ru		db1
-10.20.100.152	db02.tst2022.ru		db2
-10.20.100.153	app.tst2022.ru		app
-10.20.100.154	gitlab.tst2022.ru	gitlab
-10.20.100.155	runner.tst2022.ru	runner
-10.20.100.156	monitoring.tst2022.ru	monitoring
-
