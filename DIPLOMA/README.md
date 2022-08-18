@@ -2302,3 +2302,33 @@ groups:
 **В Grafana есть дашборд отображающий метрики из WordPress:**
 
 [wordpress](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana_wordpress_dashboard.png)
+
+
+Репозитории
+-----------
+
+[Terraform](https://github.com/Borodatko/yandex-terraform.git)
+
+[Nginx-role] (https://github.com/Borodatko/Nginx-role.git)
+
+[MySQL-role] (https://github.com/Borodatko/MySQL-role.git)
+
+[Wordpress-role] (https://github.com/Borodatko/Wordpress-role.git)
+
+[GitLab-role] (https://github.com/Borodatko/GitLab-role.git)
+
+[Monitoring-role] (https://github.com/Borodatko/Monitoring-role.git)
+
+
+Скриншоты
+---------
+
+[www](https://github.com/Borodatko/devops_netology/blob/13d68b2302eff6e88e93f67e288a57e79cc7dac9/DIPLOMA/attach/app/site_done.png)
+
+[gitlab](https://github.com/Borodatko/devops_netology/blob/13d68b2302eff6e88e93f67e288a57e79cc7dac9/DIPLOMA/attach/gitlab/gitlab1.png)
+
+[grafana](https://github.com/Borodatko/devops_netology/blob/master/DIPLOMA/attach/grafana/grafana_dashboards.png)
+
+[prometheus](https://github.com/Borodatko/devops_netology/blob/13d68b2302eff6e88e93f67e288a57e79cc7dac9/DIPLOMA/attach/proxy/web_prometheus_done.png)
+
+[alertmanager](https://github.com/Borodatko/devops_netology/blob/13d68b2302eff6e88e93f67e288a57e79cc7dac9/DIPLOMA/attach/proxy/web_alertmanager_done.png)
