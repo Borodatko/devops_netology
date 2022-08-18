@@ -1824,3 +1824,172 @@ Task в ansible, создающая пользователя с правами:
 Установка WordPress
 -------------------
 
+**В роли веб-сервера nginx:**
+
+```
+[root@app ~]# systemctl status nginx
+● nginx.service - nginx - high performance web server
+   Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; vendor preset: disabled)
+   Active: active (running) since Thu 2022-08-18 14:53:50 MSK; 2min 49s ago
+     Docs: http://nginx.org/en/docs/
+ Main PID: 3119 (nginx)
+   CGroup: /system.slice/nginx.service
+           ├─3119 nginx: master process /usr/sbin/nginx -c /etc/nginx/nginx.conf
+           ├─3120 nginx: worker process
+           ├─3121 nginx: worker process
+           ├─3122 nginx: worker process
+           └─3123 nginx: worker process
+
+Aug 18 14:53:50 app systemd[1]: Starting nginx - high performance web server...
+Aug 18 14:53:50 app systemd[1]: Started nginx - high performance web server.
+[root@app ~]# nginx -v
+nginx version: nginx/1.22.0
+```
+
+[wordpress_install](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/app/site.png)
+
+
+Установка Gitlab CE и Gitlab Runner
+-----------------------------------
+
+**Интерфейс Gitlab:**
+
+[gitlab_login](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/gitlab/gitlab1.png)
+
+[gitlab_interface](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/gitlab/gitlab2.png)
+
+При любом коммите в репозиторий с WordPress и создании тега (например, v1.0.0) происходит деплой на виртуальную машину.
+
+[pipeline](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/gitlab/gitlab_pipeline.png)
+
+[tag](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/gitlab/gitlab_tag.png)
+
+Wordpress
+
+[app](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/app/site_done.png)
+
+
+Установка Prometheus, Alert Manager, Node Exporter и Grafana
+------------------------------------------------------------
+
+**Интерфейсы Prometheus, Alert Manager и Grafana доступены по https:**
+
+[alertmanager](https://github.com/Borodatko/devops_netology/blob/master/DIPLOMA/attach/proxy/web_alertmanager_done.png)
+
+[grafana](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana.png)
+
+[prometheus](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/proxy/web_prometheus_done.png)
+
+**На всех серверах установлен Node Exporter и его метрики доступны Prometheus:**
+
+```
+[centos@monitoring ~]$ cat /etc/prometheus/prometheus.yml 
+global:
+  scrape_interval: 10s
+
+rule_files:
+  - rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        # Alertmanager's default port is 9093
+        - localhost:9093
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'monitoring'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9100']
+
+  - job_name: 'nginx'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.150:9100']
+
+  - job_name: 'db1'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.151:9100']
+
+  - job_name: 'db2'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.152:9100']
+
+  - job_name: 'app'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.153:9100']
+
+  - job_name: 'gitlab'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.154:9101']
+
+  - job_name: 'runner'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.155:9101']
+
+  - job_name: 'database'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.20.100.151:9104']
+```
+
+У Alert Manager есть необходимый набор правил для создания алертов.
+
+```
+[centos@monitoring ~]$ cat /etc/prometheus/rules.yml 
+groups:
+- name: Instances
+  rules:
+  - alert: InstanceDown
+    expr: up == 0
+    for: 5m
+    labels:
+      severity: critical
+    # Prometheus templates apply here in the annotation and label fields of the alert.
+    annotations:
+      description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.'
+      summary: 'Instance {{ $labels.instance }} down'
+  - alert: PrometheusJobMissing
+    expr: absent(up{job="prometheus"})
+    for: 0m
+    labels:
+      severity: warning
+    annotations:
+      summary: Prometheus job missing (instance {{ $labels.instance }})
+      description: "A Prometheus job has disappeared\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+```
+
+**В Grafana есть дашборд отображающий метрики из Node Exporter по всем серверам:**
+
+[nginx_proxy](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana_node_exporter_nginx_proxy.png)
+
+[db01](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana_node_exporter_db01.png)
+
+[db02](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana_node_exporter_db02.png)
+
+[app](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana_node_exporter_app.png)
+
+[gitlab](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana_node_exporter_gitlab.png)
+
+[runner](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana_node_exporter_runner.png)
+
+[monitoring](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana_node_exporter_monitoring.png)
+
+**В Grafana есть дашборд отображающий метрики из MySQL:**
+
+[mysql](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana_mysql_dashboard.png)
+
+**В Grafana есть дашборд отображающий метрики из WordPress:**
+
+[wordpress](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana_wordpress_dashboard.png)
