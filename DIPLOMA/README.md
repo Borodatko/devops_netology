@@ -3,7 +3,7 @@
 
 Был выбран reg.ru, имя домена tst2022.ru.
 
-Скриншот reg.ru:
+**Скриншот reg.ru:**
 
 [reg.ru личный кабинет](https://github.com/Borodatko/devops_netology/blob/c09ee8d259b6c01cd99a69efaeefefde74886171/DIPLOMA/attach/domain/reg_ru.png)
 
@@ -69,6 +69,9 @@ cloud {
 ```
 
 **Выполнение terraform destroy terraform plan и terraform apply:**
+
+***terraform destroy***
+
 ```
 orlov@it-14-14 centos]$ terraform destroy
 Running apply in Terraform Cloud. Output will stream here. Pressing Ctrl-C
@@ -105,7 +108,11 @@ Do you really want to destroy all resources in workspace "stage"?
   Enter a value: yes
 
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+```
 
+***terraform plan***
+
+```
 [orlov@it-14-14 centos]$ terraform plan
 Running plan in Terraform Cloud. Output will stream here. Pressing Ctrl-C
 will stop streaming the logs, but will not stop the plan running remotely.
@@ -731,7 +738,11 @@ Changes to Outputs:
   + internal_ip_address_monitoring_yandex_cloud = "10.20.100.156"
   + internal_ip_address_nginx_yandex_cloud      = "10.20.100.150"
   + internal_ip_address_runner_yandex_cloud     = "10.20.100.155"
+```
 
+***terraform apply***
+
+```
 [orlov@it-14-14 centos]$ terraform apply
 Running apply in Terraform Cloud. Output will stream here. Pressing Ctrl-C
 will cancel the remote apply if it's still pending. If the apply started it
@@ -1455,6 +1466,8 @@ internal_ip_address_runner_yandex_cloud = "10.20.100.155"
 
 **Конфиги upstream:**
 
+***alertmanager.conf***
+
 ```
 centos@tst2022 playbook]$ cat /etc/nginx/conf.d/alertmanager.conf 
 server {
@@ -1487,7 +1500,11 @@ server {
     server_name alertmanager.tst2022.ru;
     return 404; # managed by Certbot
 }
+```
 
+***gitlab.conf***
+
+```
 [centos@tst2022 playbook]$ cat /etc/nginx/conf.d/gitlab.conf 
 server {
     server_name gitlab.tst2022.ru;
@@ -1520,7 +1537,11 @@ server {
 
 
 }
+```
 
+***grafana.conf***
+
+```
 [centos@tst2022 playbook]$ cat /etc/nginx/conf.d/grafana.conf 
 server {
     server_name grafana.tst2022.ru;
@@ -1553,7 +1574,11 @@ server {
 
 
 }
+```
 
+***prometheus.conf***
+
+```
 [centos@tst2022 playbook]$ cat /etc/nginx/conf.d/prometheus.conf 
 server {
     server_name prometheus.tst2022.ru;
@@ -1587,7 +1612,11 @@ server {
 
 
 }
+```
 
+***www.conf***
+
+```
 [centos@tst2022 playbook]$ cat /etc/nginx/conf.d/www.conf 
 server {
     server_name www.tst2022.ru;
@@ -1621,8 +1650,11 @@ server {
 
 
 }
+```
 
+***upstream.conf***
 
+```
 [centos@tst2022 playbook]$ cat /etc/nginx/conf.d/upstream.conf 
 upstream www.upstream {
         server 10.20.100.153:80;
@@ -1661,7 +1693,7 @@ upstream grafana.upstream {
 Установка кластера MySQL
 ------------------------
 
-Проверка работы режима репликации master/slave MySQL кластера:
+**Проверка работы режима репликации master/slave MySQL кластера:**
 
 ```
 [centos@tst2022 playbook]$ ssh 10.20.100.152
@@ -1748,7 +1780,7 @@ mysql>
 
 В кластере автоматически создаётся база данных c именем wordpress.
 
-Вывод на slave ноде:
+**Вывод на slave ноде:**
 
 ```
 mysql> show databases;
@@ -1764,7 +1796,7 @@ mysql> show databases;
 5 rows in set (0,00 sec)
 ```
 
-Task в ansible, создающая БД:
+**Task в ansible, создающая БД:**
 
 ```
 - name: Wordpress - Create Database wordpress
@@ -1779,7 +1811,7 @@ Task в ansible, создающая БД:
 
 В кластере автоматически создаётся пользователь wordpress с полными правами на базу wordpress и паролем wordpress.
 
-Вывод на slave ноде:
+**Вывод на slave ноде:**
 
 ```
 mysql> use mysql;
@@ -1803,7 +1835,7 @@ mysql> select host,user from user;
 8 rows in set (0,00 sec)
 ```
 
-Task в ansible, создающая пользователя с правами:
+**Task в ansible, создающая пользователя с правами:**
 
 ```
 - name: Wordpress - Create User wordpress
@@ -1944,7 +1976,7 @@ scrape_configs:
       - targets: ['10.20.100.151:9104']
 ```
 
-У Alert Manager есть необходимый набор правил для создания алертов.
+**У Alert Manager есть необходимый набор правил для создания алертов:**
 
 ```
 [centos@monitoring ~]$ cat /etc/prometheus/rules.yml 
