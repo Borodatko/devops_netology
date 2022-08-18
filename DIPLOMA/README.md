@@ -4,9 +4,7 @@
 Регистрация доменного имени
 ---------------------------
 
-Был выбран reg.ru, имя домена tst2022.ru.
-
-**Скриншот reg.ru:**
+**В роли регистратора был выбран reg.ru, имя домена tst2022.ru:**
 
 [reg.ru личный кабинет](https://github.com/Borodatko/devops_netology/blob/c09ee8d259b6c01cd99a69efaeefefde74886171/DIPLOMA/attach/domain/reg_ru.png)
 
@@ -17,16 +15,65 @@
 **В качестве backend выбран terraform cloud, настроен workspace stage:**
 
 ```
-cloud {
-  organization = "netology_learn"
-  hostname = "app.terraform.io"
-  workspaces {
-    name = "stage"
+boroda@K40IJ:~/WORK/yandex-terraform$ cat provider.tf 
+terraform {
+  required_providers {
+    yandex = {
+      source = "yandex-cloud/yandex"
+    }
   }
+  cloud {
+    organization = "netology_learn"
+    hostname = "app.terraform.io"
+    workspaces {
+      name = "stage"
+    }
+  }
+}
+
+provider "yandex" {
+  service_account_key_file = "key.json"
+  cloud_id = "${var.yandex_cloud_id}"
+  folder_id = "${var.yandex_folder_id}"
 }
 ```
 
-**VPC с подсетями в разных зонах доступности:**
+**Настроен VPC с подсетями в разных зонах доступности:**
+
+***provider.tf:***
+
+```
+boroda@K40IJ:~/WORK/yandex-terraform$ cat network.tf 
+resource "yandex_vpc_network" "net" {
+  name = "net"
+}
+
+resource "yandex_vpc_route_table" "nat" {
+  network_id = "${yandex_vpc_network.net.id}"
+
+  static_route {
+    destination_prefix = "0.0.0.0/0"
+    next_hop_address   = "192.168.1.254"
+  }
+}
+
+resource "yandex_vpc_subnet" "internal" {
+  name = "internal"
+  zone = "ru-central1-a"
+  network_id = "${yandex_vpc_network.net.id}"
+  v4_cidr_blocks = ["10.20.100.0/24"]
+  route_table_id = "${yandex_vpc_route_table.nat.id}"
+}
+
+resource "yandex_vpc_subnet" "external" {
+  name = "external"
+  zone = "ru-central1-b"
+  network_id = "${yandex_vpc_network.net.id}"
+  v4_cidr_blocks = ["192.168.1.0/24"]
+}
+```
+
+***вывод terraform plan:***
 
 ```
   # yandex_vpc_network.net will be created
@@ -1696,7 +1743,9 @@ upstream grafana.upstream {
 Установка кластера MySQL
 ------------------------
 
-**Проверка работы режима репликации master/slave MySQL кластера:**
+**Проверка работы режима репликации master/slave MySQL кластера.**
+
+Проверка осуществляется на slave ноде кластера:
 
 ```
 [centos@tst2022 playbook]$ ssh 10.20.100.152
@@ -1881,6 +1930,50 @@ Aug 18 14:53:50 app systemd[1]: Started nginx - high performance web server.
 nginx version: nginx/1.22.0
 ```
 
+**В доменной зоне tst2022.ru настроена A-запись на внешний адрес reverse-proxy:**
+
+[dns_a_records](https://github.com/Borodatko/devops_netology/blob/c09ee8d259b6c01cd99a69efaeefefde74886171/DIPLOMA/attach/domain/reg_ru_records.png)
+
+**Конфиг upstream для www.tst2022.ru:**
+
+```
+[centos@tst2022 playbook]$ cat /etc/nginx/conf.d/www.conf 
+server {
+    server_name www.tst2022.ru;
+    server_tokens off;
+
+    error_log  /var/log/nginx/www.error.log;
+    access_log /var/log/nginx/www.access.log;
+
+    location / {
+        proxy_pass http://www.upstream;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/www.tst2022.ru/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/www.tst2022.ru/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = www.tst2022.ru) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name www.tst2022.ru;
+    return 404; # managed by Certbot
+
+
+}
+```
+
+**По самой URL пока отображается выбор языка с последующей установкой WP. В дальшнейшем, при работе с GitLab, будет выполнена установка Wordpress с изменением темы и добавлением плагина wp-statistics.**
+
 [wordpress_install](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/app/site.png)
 
 
@@ -1893,13 +1986,75 @@ nginx version: nginx/1.22.0
 
 [gitlab_interface](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/gitlab/gitlab2.png)
 
-При любом коммите в репозиторий с WordPress и создании тега (например, v1.0.0) происходит деплой на виртуальную машину.
+**В доменной зоне tst2022.ru настроена A-запись на внешний адрес reverse-proxy:**
+
+[dns_a_records](https://github.com/Borodatko/devops_netology/blob/c09ee8d259b6c01cd99a69efaeefefde74886171/DIPLOMA/attach/domain/reg_ru_records.png)
+
+**Конфиг upstream для gitlab.tst2022.ru:**
+
+```
+[centos@tst2022 playbook]$ cat /etc/nginx/conf.d/gitlab.conf 
+server {
+    server_name gitlab.tst2022.ru;
+    server_tokens off;
+
+    error_log  /var/log/nginx/gitlab.error.log;
+    access_log /var/log/nginx/gitlab.access.log;
+
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_pass http://gitlab.upstream;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/www.tst2022.ru/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/www.tst2022.ru/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = gitlab.tst2022.ru) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name gitlab.tst2022.ru;
+    return 404; # managed by Certbot
+
+
+}
+```
+
+**При любом коммите в репозиторий с WordPress и создании тега (например, v1.0.0) происходит деплой на виртуальную машину.**
+
+В ansible роли есть следующая task:
+
+- name: GitLab CE - Create GitLab Project Wordpress
+  community.general.gitlab_project:
+    api_url: "{{ gitlab_api_url }}"
+    api_token: "{{ gitlab_api_token_user }}"
+    name: "{{ gitlab_project_name }}"
+    import_url: "{{ github_url }}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.6
+  tags: gitlab
+
+Она создает проект и импортирует внешний репозиторий. Далее, через интерфейс гитлаба я отредактировал в репозитории переменные и создал тэг, после чего запустился деплой с:
+ - Установкой wordpress;
+ - Скачиванием и установкой плагина wp-statistics для дальнейшего мониторинга;
+ - Скачиванием и установкой темы astra.
+
+Скриншот работы pipeline:
 
 [pipeline](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/gitlab/gitlab_pipeline.png)
 
+Скриншот тэга:
+
 [tag](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/gitlab/gitlab_tag.png)
 
-**Wordpress:**
+**URL Wordpress после установки и настройки:**
 
 [app](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/app/site_done.png)
 
@@ -1914,6 +2069,14 @@ nginx version: nginx/1.22.0
 [grafana](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/grafana/grafana.png)
 
 [prometheus](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/proxy/web_prometheus_done.png)
+
+**В доменной зоне tst2022.ru настроена A-запись на внешний адрес reverse-proxy:**
+
+[dns_a_records](https://github.com/Borodatko/devops_netology/blob/c09ee8d259b6c01cd99a69efaeefefde74886171/DIPLOMA/attach/domain/reg_ru_records.png)
+
+**Конфиги upstream:**
+
+
 
 **На всех серверах установлен Node Exporter и его метрики доступны Prometheus:**
 
