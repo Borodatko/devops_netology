@@ -2076,7 +2076,116 @@ server {
 
 **Конфиги upstream:**
 
+***alertmanager.conf***
 
+```
+centos@tst2022 playbook]$ cat /etc/nginx/conf.d/alertmanager.conf 
+server {
+    server_name alertmanager.tst2022.ru;
+    server_tokens off;
+
+    error_log  /var/log/nginx/alertmanager.error.log;
+    access_log /var/log/nginx/alertmanager.access.log;
+
+    location / {
+        proxy_pass http://alertmanager.upstream;
+        proxy_set_header X-Real-IP $proxy_protocol_addr;
+        proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/www.tst2022.ru/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/www.tst2022.ru/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = alertmanager.tst2022.ru) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name alertmanager.tst2022.ru;
+    return 404; # managed by Certbot
+}
+```
+
+***grafana.conf***
+
+```
+[centos@tst2022 playbook]$ cat /etc/nginx/conf.d/grafana.conf 
+server {
+    server_name grafana.tst2022.ru;
+    server_tokens off;
+
+    error_log  /var/log/nginx/grafana.error.log;
+    access_log /var/log/nginx/grafana.access.log;
+
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_pass http://grafana.upstream;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/www.tst2022.ru/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/www.tst2022.ru/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = grafana.tst2022.ru) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name grafana.tst2022.ru;
+    return 404; # managed by Certbot
+
+
+}
+```
+
+***prometheus.conf***
+
+```
+[centos@tst2022 playbook]$ cat /etc/nginx/conf.d/prometheus.conf 
+server {
+    server_name prometheus.tst2022.ru;
+    server_tokens off;
+
+    error_log  /var/log/nginx/prometheus.error.log;
+    access_log /var/log/nginx/prometheus.access.log;
+
+    location / {
+        proxy_pass http://prometheus.upstream;
+        proxy_set_header   X-Real-IP $proxy_protocol_addr;
+        proxy_set_header   X-Forwarded-For $proxy_protocol_addr;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/www.tst2022.ru/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/www.tst2022.ru/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = prometheus.tst2022.ru) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name prometheus.tst2022.ru;
+    return 404; # managed by Certbot
+
+
+}
+```
 
 **На всех серверах установлен Node Exporter и его метрики доступны Prometheus:**
 
