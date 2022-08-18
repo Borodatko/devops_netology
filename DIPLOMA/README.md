@@ -2031,6 +2031,7 @@ server {
 
 В ansible роли есть следующая task:
 
+```
 - name: GitLab CE - Create GitLab Project Wordpress
   community.general.gitlab_project:
     api_url: "{{ gitlab_api_url }}"
@@ -2040,6 +2041,7 @@ server {
   vars:
     ansible_python_interpreter: /usr/bin/python3.6
   tags: gitlab
+```
 
 Она создает проект и импортирует внешний репозиторий. Далее, через интерфейс гитлаба я отредактировал в репозитории переменные и создал тэг, после чего запустился деплой с:
  - Установкой wordpress;
@@ -2062,7 +2064,7 @@ server {
 Установка Prometheus, Alert Manager, Node Exporter и Grafana
 ------------------------------------------------------------
 
-**Интерфейсы Prometheus, Alert Manager и Grafana доступены по https:**
+**Интерфейсы Prometheus, Alert Manager и Grafana доступны по https:**
 
 [alertmanager](https://github.com/Borodatko/devops_netology/blob/master/DIPLOMA/attach/proxy/web_alertmanager_done.png)
 
