@@ -2309,15 +2309,15 @@ groups:
 
 [Terraform](https://github.com/Borodatko/yandex-terraform.git)
 
-[Nginx-role] (https://github.com/Borodatko/Nginx-role.git)
+[Nginx-role](https://github.com/Borodatko/Nginx-role.git)
 
-[MySQL-role] (https://github.com/Borodatko/MySQL-role.git)
+[MySQL-role](https://github.com/Borodatko/MySQL-role.git)
 
-[Wordpress-role] (https://github.com/Borodatko/Wordpress-role.git)
+[Wordpress-role](https://github.com/Borodatko/Wordpress-role.git)
 
-[GitLab-role] (https://github.com/Borodatko/GitLab-role.git)
+[GitLab-role](https://github.com/Borodatko/GitLab-role.git)
 
-[Monitoring-role] (https://github.com/Borodatko/Monitoring-role.git)
+[Monitoring-role](https://github.com/Borodatko/Monitoring-role.git)
 
 
 Скриншоты
