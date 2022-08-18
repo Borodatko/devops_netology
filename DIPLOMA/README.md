@@ -1899,7 +1899,7 @@ nginx version: nginx/1.22.0
 
 [tag](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/gitlab/gitlab_tag.png)
 
-Wordpress
+**Wordpress:**
 
 [app](https://github.com/Borodatko/devops_netology/blob/718919c455389bc207de7836fb3290808a11a706/DIPLOMA/attach/app/site_done.png)
 
